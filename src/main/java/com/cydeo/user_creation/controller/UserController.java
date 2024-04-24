@@ -24,6 +24,7 @@ public class UserController {
     @GetMapping("/register")
     public String registerUser(Model model) {
         //TODO we would like to retrieve all users stored in the database by relevant html.
+        model.addAttribute("users", userService.getUsers());
 
         return "/user/register-page";
     }
@@ -31,6 +32,8 @@ public class UserController {
     @GetMapping("/create-page")
     public String getFormPage(Model model) {
         //TODO we would like to get form with necessary models
+        model.addAttribute("user", new User());
+        model.addAttribute("states", State.values());
 
         return "/user/create-page";
     }
@@ -38,6 +41,12 @@ public class UserController {
     @PostMapping("/create")
     public String createUser(@Valid @ModelAttribute("user") User user, BindingResult bindingResult, Model model) {
         //TODO register a new user with validation
+        if(bindingResult.hasErrors()){
+            model.addAttribute("states", State.values());
+            return "/user/create-page";
+        }
+
+        userService.save(user);
 
         return "redirect:/user/register";
     }
@@ -45,6 +54,8 @@ public class UserController {
     @GetMapping("/update/{email}")
     public String updateUser(@PathVariable String email, Model model) {
         //TODO we would like to get a form page with target user to update its required fields
+        model.addAttribute("user", userService.findByEmail(email));
+        model.addAttribute("states", State.values());
 
         return "/user/update-page";
     }
@@ -53,6 +64,12 @@ public class UserController {
     public String updateUser(@Valid @ModelAttribute("user") User user, BindingResult bindingResult, Model model) {
 
         //TODO register again updated user with validation
+        if(bindingResult.hasErrors()){
+            model.addAttribute("states", State.values());
+            return "/user/update-page";
+        }
+
+        userService.update(user);
 
         return "redirect:/user/register";
 
@@ -63,6 +80,8 @@ public class UserController {
 
         //TODO get specific user to show it in ui
 
+        model.addAttribute("user", userService.findByEmail(email));
+
         return "/user/user-page";
     }
 
@@ -70,12 +89,16 @@ public class UserController {
     public String deleteUser(@PathVariable String email) {
         //todo delete user based on email information
 
+        userService.deleteByEmail(email);
+
         return "redirect:/user/register";
     }
 
     @GetMapping
     public String getAllWithFirstName(@RequestParam("search") String search, Model model) {
         //TODO use search function with request param. Find corresponding method by service class.
+        model.addAttribute("users", userService.findAllUsersWithFirstName(search));
+
 
         return "/user/register-page";
     }

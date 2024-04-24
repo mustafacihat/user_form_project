@@ -10,5 +10,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         //TODO get the static ui page(welcome) if the end point is either / or /welcome
+        registry.addViewController("/").setViewName("welcome");
+        registry.addViewController("/welcome").setViewName("welcome");
+
+
     }
 }
